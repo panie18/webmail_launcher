@@ -1,0 +1,33 @@
+manifestVersion: 1
+id: webmail-launcher
+name: Webmail Launcher
+tagline: Unified webmail orchestrator with native client
+icon: https://raw.githubusercontent.com/your-org/webmail-launcher/main/icon.svg
+category: Communication
+version: "1.0.0"
+port: 3000
+description: >-
+  A self-hosted webmail launcher that unifies multiple webmail backends
+  (SnappyMail, Roundcube) with a built-in native webmail client.
+  
+  Features:
+  - One-click launch to any configured webmail
+  - Built-in native IMAP/SMTP webmail
+  - Full white-labeling support
+  - Modern, beautiful UI
+  - Security-first design
+  
+  All configuration via web UI. No manual config files needed.
+developer: Your Organization
+website: https://github.com/your-org/webmail-launcher
+dependencies: []
+repo: https://github.com/your-org/webmail-launcher
+support: https://github.com/your-org/webmail-launcher/issues
+gallery:
+  - https://raw.githubusercontent.com/your-org/webmail-launcher/main/screenshots/dashboard.png
+  - https://raw.githubusercontent.com/your-org/webmail-launcher/main/screenshots/native-webmail.png
+  - https://raw.githubusercontent.com/your-org/webmail-launcher/main/screenshots/settings.png
+releaseNotes: >-
+  Initial release with full feature set.
+submitter: Your Organization
+submission: https://github.com/getumbrel/umbrel-apps/pull/XXX

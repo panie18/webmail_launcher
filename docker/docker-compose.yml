@@ -1,0 +1,98 @@
+version: "3.9"
+
+services:
+  webmail-launcher:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: webmail-launcher
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=64M,mode=1777
+      - /app/.next/cache:size=128M,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    environment:
+      - NODE_ENV=production
+      - DATABASE_PATH=/data/webmail.db
+      - ENCRYPTION_KEY_FILE=/run/secrets/encryption_key
+    volumes:
+      - webmail_data:/data:rw
+    secrets:
+      - encryption_key
+    networks:
+      - webmail_internal
+      - webmail_proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.webmail.rule=Host(`webmail.local`)"
+      - "traefik.http.services.webmail.loadbalancer.server.port=3000"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  snappymail:
+    image: djmaze/snappymail:latest
+    container_name: webmail-snappymail
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=64M,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - snappymail_data:/var/lib/snappymail:rw
+    networks:
+      - webmail_internal
+    expose:
+      - "8888"
+
+  roundcube:
+    image: roundcube/roundcubemail:latest
+    container_name: webmail-roundcube
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=64M,mode=1777
+      - /var/www/html/temp:size=64M,mode=1777
+      - /var/www/html/logs:size=32M,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    environment:
+      - ROUNDCUBEMAIL_DEFAULT_HOST=ssl://localhost
+      - ROUNDCUBEMAIL_SMTP_SERVER=ssl://localhost
+    volumes:
+      - roundcube_data:/var/roundcube/db:rw
+    networks:
+      - webmail_internal
+    expose:
+      - "80"
+
+volumes:
+  webmail_data:
+    driver: local
+  snappymail_data:
+    driver: local
+  roundcube_data:
+    driver: local
+
+networks:
+  webmail_internal:
+    driver: bridge
+    internal: true
+  webmail_proxy:
+    driver: bridge
+
+secrets:
+  encryption_key:
+    file: ./secrets/encryption_key
