@@ -89,13 +89,17 @@ check_requirements() {
         fail "Docker version $MIN_DOCKER_VERSION required (found: $docker_version)"
     fi
     log_success "Docker $docker_version"
-    if docker compose version &>/dev/null; then
+    
+    if command_exists docker-compose; then
+        local compose_version
+        compose_version=$(docker-compose version --short 2>/dev/null || echo "0.0.0")
+        log_success "Docker Compose $compose_version (docker-compose)"
+        COMPOSE_CMD="docker-compose"
+    elif docker compose version &>/dev/null 2>&1; then
         local compose_version
         compose_version=$(docker compose version --short 2>/dev/null || echo "0.0.0")
-        log_success "Docker Compose $compose_version"
+        log_success "Docker Compose $compose_version (docker compose)"
         COMPOSE_CMD="docker compose"
-    elif command_exists docker-compose; then
-        COMPOSE_CMD="docker-compose"
     else
         fail "Docker Compose is not installed"
     fi
