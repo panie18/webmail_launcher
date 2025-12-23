@@ -112,6 +112,16 @@ check_requirements() {
 
 setup_directories() {
     log_info "Setting up directories..."
+    
+    if [[ -d "$INSTALL_DIR" ]]; then
+        log_info "Existing installation found, cleaning up..."
+        cd "$INSTALL_DIR"
+        $COMPOSE_CMD down --remove-orphans 2>/dev/null || true
+        cd ~
+        rm -rf "$INSTALL_DIR"
+        log_success "Old installation removed"
+    fi
+    
     mkdir -p "$INSTALL_DIR"
     mkdir -p "$INSTALL_DIR/docker/secrets"
     mkdir -p "$INSTALL_DIR/data"
